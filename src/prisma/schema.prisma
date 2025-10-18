@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 Int       @id @default(autoincrement())
+  name               String
+  email              String    @unique
+  phone              String?
+  password           String
+  status             Status    @default(active)
+  last_login         DateTime?
+  created_by         String
+  created_at         DateTime  @default(now())
+  updated_by         String?
+  updated_at         DateTime  @updatedAt
+ 
+  @@map("tbl_user")
+}
+
+model InvoiceHeader {
+  id                Int       @id @default(autoincrement())
+  tran_no           String    @unique
+  tran_date         DateTime  @db.Date
+  payment_date      DateTime  @db.Date
+  vendor_id         Int
+  vendor_name       String?
+  vendor_address    String?
+  ref_no            String?
+  payment_terms     String?
+  receiver_name     String?
+  receiver_address  String?
+  sub_total         Decimal   @db.Decimal(10, 2)
+  gst               Decimal   @db.Decimal(10, 2)
+  discount          Decimal   @db.Decimal(10, 2)
+  total             Decimal   @db.Decimal(10, 2)
+  amount_paid       Decimal   @db.Decimal(10, 2)
+  amount_balance    Decimal   @db.Decimal(10, 2)
+  status            String?
+  notes             String?
+  upload_doc        String?
+  body_data         Json?
+  created_by        String
+  created_at        DateTime  @default(now())
+  updated_by        String?
+  updated_at        DateTime  @updatedAt
+  details           InvoiceDetails[]
+  vendorRel         Vendor  @relation(fields: [vendor_id], references: [id]) 
+
+  @@map("tbl_invoiceHeader")
+}
+
+model InvoiceDetails {
+  id                Int       @id @default(autoincrement())
+  header_id         Int
+  tran_no           String  
+  sku               String
+  name              String
+  price             Decimal   @db.Decimal(10, 2)
+  quantity          Int
+  total_price       Decimal   @db.Decimal(10, 2) 
+  sno               Int
+  notes             String?
+  created_by        String
+  created_at        DateTime  @default(now())
+  updated_by        String?
+  updated_at        DateTime  @updatedAt
+  headerRel         InvoiceHeader  @relation(fields: [header_id], references: [id]) 
+
+  @@map("tbl_invoiceDetails")
+}
+
+model Vendor{
+  id            Int      @id @default(autoincrement())
+  name          String?
+  phone         String?
+  email         String?
+  address1      String?
+  address2      String?
+  country       String?
+  zipcode       String?
+  remarks       String?
+  created_by        String
+  created_at        DateTime  @default(now())
+  updated_by        String?
+  updated_at        DateTime  @updatedAt
+  invoices          InvoiceHeader[]
+  
+  @@map("tbl_vendor")
+  }
+
+
+enum Status {
+  active
+  inactive
+}

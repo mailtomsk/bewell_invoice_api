@@ -1,0 +1,46 @@
+{
+  "name": "api_bewll",
+  "version": "1.0.0",
+  "main": "index.js",
+  "prisma": {
+    "schema": "src/prisma/schema.prisma",
+    "seed": "ts-node src/prisma/seed.ts"
+  },
+  "scripts": {
+    "dev": "nodemon src/index.ts",
+    "start": "node src/index.ts",
+    "seed": "ts-node src/prisma/seed.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@types/multer": "^2.0.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "express-validator": "^7.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.5",
+    "nodemon": "^3.1.10",
+    "openai": "^5.13.1",
+    "pdf-parse": "^1.1.1",
+    "pg": "^8.16.3",
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "@prisma/client": "^6.13.0",
+    "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/nodemailer": "^6.4.17",
+    "@types/pdf-parse": "^1.1.5",
+    "prisma": "^6.13.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.3"
+  }
+}
