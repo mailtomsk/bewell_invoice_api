@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { successResponseAdmin, errorResponseAdmin } from "../../utils/response";
 import {parseDate} from "../../utils/lib";
-import {InVoiceStoreService,InVoiceDetailsStoreService,listAllInvoices,lastInvoiceID,createVendor,getVendorId,updateInvoiceDoc} 
-from "../../services/invoice.services"
+import {InVoiceStoreService,InVoiceDetailsStoreService,listAllInvoices,lastInvoiceID,createVendor,
+    getVendorId,updateInvoiceDoc,listVendorsWithStats} from "../../services/invoice.services"
 
 import { upload } from "../../middlewares/upload";
 
@@ -151,3 +151,12 @@ export const uploadDocument = async (req: Request, res: Response) => {
     }
   });
 };
+
+export const getAllVendors = async (req: Request, res: Response) => {
+    try {
+        const finalResult = await listVendorsWithStats();
+        return successResponseAdmin(res, 'Vendor List', 200, finalResult);
+    } catch (error: any) {
+        return errorResponseAdmin(res, 'Something Went wrong');
+    }
+}

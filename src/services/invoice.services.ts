@@ -61,3 +61,43 @@ export const lastInvoiceID = async () => {
     });
     return last;
 };
+
+export const listAllVendors = async () => {
+    const vendors = await prisma.vendor.findMany({
+    orderBy: { created_at: 'desc' },    
+    });
+    return vendors;
+};
+export const listVendorsWithStats = async () => {
+  const vendorsWithStats = await prisma.vendor.findMany({
+    orderBy: { created_at: "desc" },
+    select: {
+      id: true,
+      name: true,
+      phone: true,
+      email: true,
+      invoices: {
+        select: {
+          total: true,
+          status: true,
+        },
+      },
+    },
+  });
+
+  // Map to include invoice count and total amount
+  const result = vendorsWithStats.map((vendor) => {
+    const invoiceCount = vendor.invoices.length;
+    const totalAmount = vendor.invoices.reduce((sum, inv) => sum + Number(inv.total), 0);
+    return {
+      id: vendor.id,
+      name: vendor.name,
+      phone: vendor.phone,
+      email: vendor.email,
+      invoiceCount,
+      totalAmount,
+    };
+  });
+
+  return result;
+};

@@ -3,7 +3,7 @@ import { Router, Request, Response, NextFunction } from 'express'
 import { invoiceValidation,authAdminLoginValidation} from "../validation/admin.validation";
 
 import { validate } from "../middlewares/validate";
-import { createInvoice,getAllInvoices,uploadDocument } from "../controllers/admin/invoice.controller";
+import { createInvoice,getAllInvoices,uploadDocument,getAllVendors } from "../controllers/admin/invoice.controller";
 import { adminLogin} from "../controllers/admin/auth.controler";
 
 import { adminGuard } from "../middlewares/authGuards.middleware";
@@ -20,6 +20,7 @@ admin.post('/create_invoice', invoiceValidation, createInvoice)
 admin.post('/upload_doc', invoiceValidation, uploadDocument)
 
 admin.get('/invoices', getAllInvoices);
+admin.get('/vendors', getAllVendors);
 
 
 export default admin;
