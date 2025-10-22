@@ -1,6 +1,13 @@
 import { Request, Response } from "express";
 import { successResponseAdmin, errorResponseAdmin } from "../../utils/response";
-import {InVoiceStoreService,InVoiceDetailsStoreService,listAllInvoices,lastInvoiceID,createVendor,getVendorId} from "../../services/invoice.services"
+import {parseDate} from "../../utils/lib";
+import {InVoiceStoreService,InVoiceDetailsStoreService,listAllInvoices,lastInvoiceID,createVendor,getVendorId,updateInvoiceDoc} 
+from "../../services/invoice.services"
+
+import { upload } from "../../middlewares/upload";
+
+import * as path from 'path';
+import * as fs from 'fs';
 
 
 export const getAllInvoices = async (req: Request, res: Response) => {
@@ -22,10 +29,13 @@ export const createInvoice = async (req: Request, res: Response) => {
         }
 
       
-        const dateInput = req.body.date;
-
+        let dateInput = req.body.date;
         // if req.body.date is empty, null, or invalid → use current date
-        const tranDate = dateInput && dateInput.trim() !== '' ? new Date(dateInput) : new Date(); // current date & time
+        let tranDate = new Date();
+        if(dateInput){
+            console.log(dateInput);
+            tranDate = parseDate(dateInput);
+        }
         let cleanedName ='';
         if(req.body.vendorName){           
             let vendorName = req.body.vendorName;
@@ -48,7 +58,6 @@ export const createInvoice = async (req: Request, res: Response) => {
         }
         
         const existRes = await getVendorId(vendorAry);
-        console.log(existRes)
         let vendorId = 0;
         if(existRes){
             vendorId = existRes.id;
@@ -56,7 +65,7 @@ export const createInvoice = async (req: Request, res: Response) => {
             const newVendor = await createVendor(vendorAry);
             vendorId = newVendor.id;
         
-        }        
+        }              
         if(vendorId){
             const HeaderDetails: any = {
             tran_no: tranNo,
@@ -104,3 +113,41 @@ export const createInvoice = async (req: Request, res: Response) => {
         return errorResponseAdmin(res, error.message || 'Failed to create', 500);
     }
 }
+
+export const uploadDocument = async (req: Request, res: Response) => {
+  
+  // handle the multer middleware manually
+  upload.single("invoice_doc")(req, res, async (err: any) => {
+    try {
+      if (err) {
+        console.error("Multer error:", err);
+        return errorResponseAdmin(res, err.message || "File upload failed", 400);
+      }
+
+      const { invoiceId } = req.body;
+
+      if (!invoiceId) {
+        return errorResponseAdmin(res, "invoiceId is required", 400);
+      }
+
+      if (!req.file) {
+        return errorResponseAdmin(res, "No document uploaded", 400);
+      }
+
+      // 👉 Extract filename info
+      const { filename, originalname, path: filePath } = req.file;
+
+      // Optional: Save file info to DB here
+       const docData = {invoiceId:parseInt(invoiceId,10),upload_doc: filename};
+       await updateInvoiceDoc(docData);
+
+      return successResponseAdmin(res, "Document uploaded successfully", 200, {
+        invoiceId,
+        filePath,
+      });
+    } catch (error: any) {
+      console.error("Error in uploadDocument:", error);
+      return errorResponseAdmin(res, error.message || "Failed to upload document", 500);
+    }
+  });
+};

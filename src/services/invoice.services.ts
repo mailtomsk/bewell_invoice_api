@@ -2,6 +2,14 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+
+export const updateInvoiceDoc = async ( data : any) => {
+    return await prisma.invoiceHeader.update({
+        where: { id: data.invoiceId },
+        data: { upload_doc: data.upload_doc },
+    });
+}
+
 export const InVoiceStoreService = async(data: any) => {
  return await prisma.invoiceHeader.create({ data });
 }

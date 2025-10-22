@@ -18,3 +18,4 @@ export const lastLoginUpdate = async ( data : any) => {
         data: { last_login: new Date() },
     });
 }
+
