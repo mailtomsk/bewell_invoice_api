@@ -7,7 +7,7 @@ import path from 'path';
 dotenv.config();
 
 const corsOptions = {
-    origin: ['http://localhost:5173','https://assent-ai.oclocksoftware.info'],
+    origin: ['http://localhost:5173','https://assent-ai.oclocksoftware.info','https://snapme.juzapps.com'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'x-api-key'],
     credentials: true,
