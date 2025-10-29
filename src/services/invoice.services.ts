@@ -101,3 +101,11 @@ export const listVendorsWithStats = async () => {
 
   return result;
 };
+
+export const inVoiceUpdateService = async ( data : any,invoiceNumber:number) => {
+    
+    return await prisma.invoiceHeader.update({
+        where: { id: invoiceNumber },
+        data: data,
+    });
+}

@@ -2,12 +2,13 @@ import { Request, Response } from "express";
 import { successResponseAdmin, errorResponseAdmin } from "../../utils/response";
 import {parseDate} from "../../utils/lib";
 import {InVoiceStoreService,InVoiceDetailsStoreService,listAllInvoices,lastInvoiceID,createVendor,
-    getVendorId,updateInvoiceDoc,listVendorsWithStats} from "../../services/invoice.services"
+    getVendorId,updateInvoiceDoc,listVendorsWithStats,inVoiceUpdateService} from "../../services/invoice.services"
 
 import { upload } from "../../middlewares/upload";
 
 import * as path from 'path';
 import * as fs from 'fs';
+import { console } from "inspector";
 
 
 export const getAllInvoices = async (req: Request, res: Response) => {
@@ -34,8 +35,10 @@ export const createInvoice = async (req: Request, res: Response) => {
         let tranDate = new Date();
         if(dateInput){
             console.log(dateInput);
-            tranDate = parseDate(dateInput);
+            tranDate = parseDate(dateInput) ?? new Date(); // use ?? to handle null
         }
+        console.log(tranDate);
+        
         let cleanedName ='';
         if(req.body.vendorName){           
             let vendorName = req.body.vendorName;
@@ -65,7 +68,7 @@ export const createInvoice = async (req: Request, res: Response) => {
             const newVendor = await createVendor(vendorAry);
             vendorId = newVendor.id;
         
-        }              
+        }  
         if(vendorId){
             const HeaderDetails: any = {
             tran_no: tranNo,
@@ -158,5 +161,28 @@ export const getAllVendors = async (req: Request, res: Response) => {
         return successResponseAdmin(res, 'Vendor List', 200, finalResult);
     } catch (error: any) {
         return errorResponseAdmin(res, 'Something Went wrong');
+    }
+}
+
+export const updateInvoice = async (req: Request, res: Response) => {
+    try {
+        const invoiceId = req.body.invoiceId;
+        if(invoiceId){
+            const updateHeaderDetails: any = {
+            status:req.body.status,
+            total: req.body.total,
+            sub_total: req.body.sub_total,
+            tax: req.body.tax,
+            };
+           
+            const result = await inVoiceUpdateService(updateHeaderDetails,invoiceId);
+            return successResponseAdmin(res, 'updated successfully', 200, result);
+        }else{
+             return errorResponseAdmin(res, 'Failed to create Vendor missing', 500);
+        }
+        
+    } catch (error: any) {
+        console.error('Error in create:', error);
+        return errorResponseAdmin(res, error.message || 'Failed to create', 500);
     }
 }
