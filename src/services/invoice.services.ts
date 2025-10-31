@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { startOfMonth } from 'date-fns';
 
 const prisma = new PrismaClient();
 
@@ -109,3 +110,36 @@ export const inVoiceUpdateService = async ( data : any,invoiceNumber:number) => 
         data: data,
     });
 }
+
+export const getInvoiceStats = async () => {
+  // Start of the current month
+  const monthStart = startOfMonth(new Date());
+
+  // Run all counts/sums in parallel
+  const [totalInvoices, totalAmount, paidInvoices, unpaidInvoices, thisMonthInvoices] =
+    await Promise.all([
+      prisma.invoiceHeader.count(),
+      prisma.invoiceHeader.aggregate({
+        _sum: { total: true },
+      }),
+      prisma.invoiceHeader.count({
+        where: { status: 'paid' },
+      }),
+      prisma.invoiceHeader.count({
+        where: { status: 'unpaid' },
+      }),
+      prisma.invoiceHeader.count({
+        where: {
+          tran_date: { gte: monthStart },
+        },
+      }),
+    ]);
+
+  return {
+    totalInvoices,
+    totalAmount: totalAmount._sum.total || 0,
+    paidInvoices,
+    unpaidInvoices,
+    thisMonthInvoices,
+  };
+};

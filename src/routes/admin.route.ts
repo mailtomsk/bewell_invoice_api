@@ -4,7 +4,7 @@ import { invoiceValidation,authAdminLoginValidation} from "../validation/admin.v
 
 import { validate } from "../middlewares/validate";
 import { createInvoice,getAllInvoices,uploadDocument,getAllVendors,
-    updateInvoice } from "../controllers/admin/invoice.controller";
+    updateInvoice,dashboardDetails } from "../controllers/admin/invoice.controller";
 import { adminLogin} from "../controllers/admin/auth.controler";
 
 import { adminGuard } from "../middlewares/authGuards.middleware";
@@ -24,6 +24,7 @@ admin.post('/upload_doc', invoiceValidation, uploadDocument)
 
 admin.get('/invoices', getAllInvoices);
 admin.get('/vendors', getAllVendors);
+admin.get('/dashboard', dashboardDetails);
 
 
 export default admin;

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { successResponseAdmin, errorResponseAdmin } from "../../utils/response";
 import {parseDate} from "../../utils/lib";
 import {InVoiceStoreService,InVoiceDetailsStoreService,listAllInvoices,lastInvoiceID,createVendor,
-    getVendorId,updateInvoiceDoc,listVendorsWithStats,inVoiceUpdateService} from "../../services/invoice.services"
+    getVendorId,updateInvoiceDoc,listVendorsWithStats,inVoiceUpdateService,getInvoiceStats} from "../../services/invoice.services"
 
 import { upload } from "../../middlewares/upload";
 
@@ -184,5 +184,17 @@ export const updateInvoice = async (req: Request, res: Response) => {
     } catch (error: any) {
         console.error('Error in create:', error);
         return errorResponseAdmin(res, error.message || 'Failed to create', 500);
+    }
+}
+
+export const dashboardDetails = async (req: Request, res: Response) => {
+    try {
+        const overview = await getInvoiceStats();
+        const finalResult:any={
+            overview : overview
+        } 
+        return successResponseAdmin(res, 'Dashboard List', 200, finalResult);
+    } catch (error: any) {
+        return errorResponseAdmin(res, 'Something Went wrong');
     }
 }
